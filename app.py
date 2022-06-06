@@ -7,7 +7,7 @@ app = Chalice(app_name='checkout_cart')
 local_session = Session(bind=engine)
 
 
-@app.route('/')
+@app.route('/hello')
 def index():
     return {'hello': 'world'}
 
