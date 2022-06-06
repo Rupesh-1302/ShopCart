@@ -15,7 +15,7 @@ bytes(json.dumps({
 
 @app.route('/')
 def index():
-    return Response(status_code=200, body=bytes(json.dumps({'hello': 'world'}).encode('utf-8')))
+    return Response(status_code=200, body=bytes(json.dumps({'hello': 'world'}).encode('utf-8')), headers={'Content-type': 'application/json; charset=utf-8'})
 
 
 @app.route('/api/register', methods=['POST'])
