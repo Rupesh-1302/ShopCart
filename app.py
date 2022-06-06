@@ -1,3 +1,5 @@
+from email import header
+from wsgiref import headers
 from chalice import Chalice, Response
 from DatabaseTasks.main import Product, Cart, Session, User, engine
 from hashlib import sha256
@@ -22,24 +24,18 @@ def register():
         password = data['password']
 
         if(len(password) < 8):
-            return Response(
-                body={
-                    "Type": "Error",
-                    "Message": "Password must be atleast 8 characters long"
-                },
-                status_code=400,
-            )
+            return {
+                "Type": "Error",
+                "Message": "Password must be atleast 8 characters long"
+            }
 
         users = local_session.query(User).all()
         for user in users:
             if(user.user_name == user_name):
-                return Response(
-                    body={
-                        "Type": "Error",
-                        "Message": "User already exists"
-                    },
-                    status_code=400,
-                )
+                return {
+                    "Type": "Error",
+                    "Message": "User already exists"
+                }
 
         h = sha256()
         h.update(password.encode())
@@ -51,23 +47,17 @@ def register():
 
         local_session.commit()
 
-        return Response(
-            body={
-                "Type": "Success",
-                "Message": "User registered successfully",
-            },
-            status_code=201,
-        )
+        return {
+            "Type": "Success",
+            "Message": "User registered successfully",
+        }
 
     except Exception as e:
-        return Response(
-            body={
-                "Type": "Error",
-                "Message": "Something went wrong, please try again.",
-                "Error": str(e),
-            },
-            status_code=400,
-        )
+        return {
+            "Type": "Error",
+            "Message": "Something went wrong, please try again.",
+            "Error": str(e),
+        }
 
 
 @app.route('/api/login', methods=['POST'])
@@ -86,44 +76,32 @@ def login():
                 isUser = True
 
         if not isUser:
-            return Response(
-                body={
-                    "Type": "Error",
-                    "Message": "User not registered",
-                },
-                status_code=400,
-            )
+            return {
+                "Type": "Error",
+                "Message": "User not registered",
+            }
 
         h = sha256()
         h.update(password.encode())
         hash = h.hexdigest()
 
         if(old_password != hash):
-            return Response(
-                body={
-                    "Type": "Error",
-                    "Message": "Password is incorrect",
-                },
-                status_code=400,
-            )
+            return {
+                "Type": "Error",
+                "Message": "Password is incorrect",
+            }
 
-        return Response(
-            body={
-                "Type": "Success",
-                "Message": "User logged in successfully",
-            },
-            status_code=200,
-        )
+        return {
+            "Type": "Success",
+            "Message": "User logged in successfully",
+        }
 
     except Exception as e:
-        return Response(
-            body={
-                "Type": "Error",
-                "Message": "Something went wrong, please try again.",
-                "Error": str(e),
-            },
-            status_code=400,
-        )
+        return {
+            "Type": "Error",
+            "Message": "Something went wrong, please try again.",
+            "Error": str(e),
+        }
 
 
 @app.route('/api/cart', methods=['POST', 'DELETE'], cors=True)
@@ -136,7 +114,7 @@ def handle_cart():
     if 'quantity' in data:
         quantity = data["quantity"]
     if not user_id or not product_id:
-        return Response(status_code=403, body={"message": "Invalid Request"})
+        return {"message": "Invalid Request"}
 
     if request.method == 'POST':
         try:
@@ -144,17 +122,17 @@ def handle_cart():
                 userId=user_id, productId=product_id, quantity=quantity)
             local_session.add(newCartItem)
             local_session.commit()
-            return Response(status_code=200, body={"message": "Item added to cart successfully"})
+            return {"message": "Item added to cart successfully"}
         except Exception as e:
             print(e)
-            return Response(status_code=400, body={"message": "Something went Wrong"})
+            return {"message": "Something went Wrong"}
     else:
         try:
             cartItem = local_session.query(Cart).filter(
                 Cart.userId == user_id).filter(Cart.productId == product_id).first()
             local_session.delete(cartItem)
             local_session.commit()
-            return Response(status_code=200, body={"message": "Item deleted from cart successfully"})
+            return {"message": "Item deleted from cart successfully"}
         except Exception as e:
             print(e)
-            return Response(status_code=400, body={"message": "Something went Wrong"})
+            return {"message": "Something went Wrong"}
