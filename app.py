@@ -158,7 +158,3 @@ def handle_cart():
         except Exception as e:
             print(e)
             return Response(status_code=400, body={"message": "Something went Wrong"})
-
-
-if "__name__" == "__main__":
-    app.run(debug=True)
