@@ -12,18 +12,15 @@ def index():
     return {'hello': 'world'}
 
 
-#  Making a POST request to register a new user
 @app.route('/api/register', methods=['POST'])
 def register():
     """ Register a new user """
     try:
-        # Taking the data from the request
         data = app.current_request.json_body
         user_name = data['user_name']
         full_name = data['full_name']
         password = data['password']
 
-        #  Checking if password is strong enough
         if(len(password) < 8):
             return Response(
                 body={
@@ -33,7 +30,6 @@ def register():
                 status_code=400,
             )
 
-        # Checking if user name is already taken
         users = local_session.query(User).all()
         for user in users:
             if(user.user_name == user_name):
@@ -45,20 +41,16 @@ def register():
                     status_code=400,
                 )
 
-        #  Converting the password to hash
         h = sha256()
         h.update(password.encode())
         hash = h.hexdigest()
 
-        # Creating the user
         user_data = User(user_name=user_name,
                          full_name=full_name, password=hash)
         local_session.add(user_data)
 
-        #  Committing the changes
         local_session.commit()
 
-        # Returning the response
         return Response(
             body={
                 "Type": "Success",
@@ -67,7 +59,6 @@ def register():
             status_code=201,
         )
 
-    #  Handling the error
     except Exception as e:
         return Response(
             body={
@@ -79,25 +70,21 @@ def register():
         )
 
 
-# Making a POST request to login a user
 @app.route('/api/login', methods=['POST'])
 def login():
     """ Login a user """
     try:
-        # Taking the data from the request
         data = app.current_request.json_body
         user_name = data['user_name']
         password = data['password']
         isUser = False
 
-        # Checking if user name is registered
         users = local_session.query(User).all()
         for user in users:
             if(user.user_name == user_name):
                 old_password = user.password
                 isUser = True
 
-        # If user name is not registered return error
         if not isUser:
             return Response(
                 body={
@@ -107,12 +94,10 @@ def login():
                 status_code=400,
             )
 
-        #  Converting the password to hash
         h = sha256()
         h.update(password.encode())
         hash = h.hexdigest()
 
-        # Checking if password is correct
         if(old_password != hash):
             return Response(
                 body={
@@ -130,7 +115,6 @@ def login():
             status_code=200,
         )
 
-    # Handling the error
     except Exception as e:
         return Response(
             body={
@@ -140,9 +124,6 @@ def login():
             },
             status_code=400,
         )
-
-
-# route for handling Cart Addition and Deletion
 
 
 @app.route('/api/cart', methods=['POST', 'DELETE'], cors=True)
@@ -158,7 +139,6 @@ def handle_cart():
         return Response(status_code=403, body={"message": "Invalid Request"})
 
     if request.method == 'POST':
-        # Handling adding to cart
         try:
             newCartItem = Cart(
                 userId=user_id, productId=product_id, quantity=quantity)
@@ -169,7 +149,6 @@ def handle_cart():
             print(e)
             return Response(status_code=400, body={"message": "Something went Wrong"})
     else:
-        # Handling Deletion from cart
         try:
             cartItem = local_session.query(Cart).filter(
                 Cart.userId == user_id).filter(Cart.productId == product_id).first()
@@ -181,6 +160,5 @@ def handle_cart():
             return Response(status_code=400, body={"message": "Something went Wrong"})
 
 
-#  Driver code
 if "__name__" == "__main__":
     app.run(debug=True)
