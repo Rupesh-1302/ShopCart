@@ -7,15 +7,16 @@ app = Chalice(app_name='checkout_cart')
 
 local_session = Session(bind=engine)
 
-bytes(json.dumps({
-    "Type": "Error",
-    "Message": "Password must be atleast 8 characters long"
-}).encode('utf-8'))
-
 
 @app.route('/')
 def index():
-    return Response(status_code=200, body=bytes(json.dumps({'hello': 'world'}).encode('utf-8')), headers={'Content-type': 'application/json; charset=utf-8'})
+    response = Response(status_code=200, body=bytes(json.dumps(
+        {'hello': 'world'}).encode('utf-8')))
+    new_resp_headers = {}
+    for k, v in response.headers.items():
+        new_resp_headers[k.encode('ISO-8859-1')] = v.encode('ISO-8859-1')
+    response.headers = new_resp_headers
+    return response
 
 
 @app.route('/api/register', methods=['POST'])
