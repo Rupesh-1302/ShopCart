@@ -12,12 +12,13 @@ local_session = Session(bind=engine)
 
 @app.route('/')
 def index():
-    response = Response(status_code=200, body=json.dumps({'hello': 'world'}).encode(
-        'utf-8'), headers={'Content-Type': 'application/json'})
+    # response = Response(status_code=200, body=json.dumps({'hello': 'world'}).encode(
+    #     'utf-8'), headers={'Content-Type': 'application/json'})
     # for k, v in response.headers.items():
     #     new_resp_headers[k.encode('ISO-8859-1')] = v.encode('ISO-8859-1')
     # response.headers = new_resp_headers
-    return response
+
+    return json.dumps({'hello': 'world'}).encode('utf-8')
 
 
 @app.route('/api/register', methods=['POST'])
