@@ -10,8 +10,8 @@ local_session = Session(bind=engine)
 
 @app.route('/')
 def index():
-    response = Response(body=json.dumps([{'hello': 'world'}]).encode(
-        'utf-8'), headers=None)
+    response = Response(status_code=200, body=json.dumps([{'hello': 'world'}]).encode(
+        'utf-8'), headers={'Content-Type': 'application/json'})
     return response
     # return [json.dumps({'hello': 'world'}).encode('utf-8')]
 
