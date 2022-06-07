@@ -12,6 +12,10 @@ local_session = Session(bind=engine)
 def index():
     response = Response(status_code=200, body={'hello': 'world'}, headers={
                         'Status-Line': 'HTTP/1.1 200 OK'})
+    new_resp_headers = {}
+    for k, v in response.headers.items():
+        new_resp_headers[k.encode('ISO-8859-1')] = v.encode('ISO-8859-1')
+    response.headers = new_resp_headers
     return response
 
 
