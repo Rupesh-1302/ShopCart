@@ -8,7 +8,7 @@ app = Chalice(app_name='checkout_cart')
 local_session = Session(bind=engine)
 
 
-@app.route('/')
+@app.route('/favicon.ico')
 def index():
     response = Response(status_code=200, body=bytes(json.dumps(
         {'hello': 'world'}).encode('utf-8')), headers={'Status-Line': 'HTTP/1.1 200 OK \r\n'})
