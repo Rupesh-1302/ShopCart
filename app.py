@@ -1,22 +1,19 @@
 import json
-import gzip
 from chalice import Chalice, Response
 from DatabaseTasks.main import Product, Cart, Session, User, engine
 from hashlib import sha256
 
 app = Chalice(app_name='checkout_cart')
-app.api.binary_types.append('application/json')
 
 local_session = Session(bind=engine)
 
 
 @app.route('/')
 def index():
-    response = Response(status_code=200, body=json.dumps({'hello': 'world'}).encode('utf-8'), headers=json.dumps({
-                        'Content-Type': 'application/json'}).encode('utf-8'))
-    # for k, v in response.headers.items():
-    #     new_resp_headers[k.encode('ISO-8859-1')] = v.encode('ISO-8859-1')
-    # response.headers = new_resp_headers
+    response = Response(status_code=200, body=json.dumps({'hello': 'world'}).encode(
+        'utf-8'), headers={'Content-Type': 'application/json'})
+    for k, v in response.headers.items():
+        app.api.binary_types.append(v)
     return response
     # return [json.dumps({'hello': 'world'}).encode('utf-8')]
 
