@@ -1,1 +1,1 @@
-web: chalice local
+web: chalice local --port=$PORT
